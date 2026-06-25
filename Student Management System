@@ -1,0 +1,301 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+class Student
+{
+private:
+    int rollNo;
+    string name;
+    int age;
+    string department;
+
+public:
+    void input()
+    {
+        cout << "\nEnter Roll Number : ";
+        cin >> rollNo;
+
+        cin.ignore();
+
+        cout << "Enter Name        : ";
+        getline(cin, name);
+
+        cout << "Enter Age         : ";
+        cin >> age;
+
+        cin.ignore();
+
+        cout << "Enter Department  : ";
+        getline(cin, department);
+    }
+
+    void display()
+    {
+        cout << left << setw(15) << rollNo
+             << setw(25) << name
+             << setw(10) << age
+             << setw(20) << department << endl;
+    }
+
+    int getRollNo()
+    {
+        return rollNo;
+    }
+
+    void writeToFile()
+    {
+        ofstream file("students.txt", ios::app);
+
+        file << rollNo << endl;
+        file << name << endl;
+        file << age << endl;
+        file << department << endl;
+
+        file.close();
+    }
+
+    bool readFromFile(ifstream &file)
+    {
+        if (!(file >> rollNo))
+            return false;
+
+        file.ignore();
+
+        getline(file, name);
+
+        file >> age;
+        file.ignore();
+
+        getline(file, department);
+
+        return true;
+    }
+
+    void writeTemp(ofstream &temp)
+    {
+        temp << rollNo << endl;
+        temp << name << endl;
+        temp << age << endl;
+        temp << department << endl;
+    }
+};
+
+void addStudent()
+{
+    Student s;
+
+    s.input();
+    s.writeToFile();
+
+    cout << "\nStudent Record Added Successfully!\n";
+}
+
+void displayStudents()
+{
+    ifstream file("students.txt");
+
+    if (!file)
+    {
+        cout << "\nNo Records Found!\n";
+        return;
+    }
+
+    Student s;
+
+    cout << "\n================ STUDENT RECORDS ================\n\n";
+
+    cout << left << setw(15) << "Roll No"
+         << setw(25) << "Name"
+         << setw(10) << "Age"
+         << setw(20) << "Department" << endl;
+
+    cout << "--------------------------------------------------------------\n";
+
+    while (s.readFromFile(file))
+    {
+        s.display();
+    }
+
+    file.close();
+}
+
+void searchStudent()
+{
+    int roll;
+    bool found = false;
+
+    cout << "\nEnter Roll Number to Search : ";
+    cin >> roll;
+
+    ifstream file("students.txt");
+
+    Student s;
+
+    while (s.readFromFile(file))
+    {
+        if (s.getRollNo() == roll)
+        {
+            cout << "\nStudent Found!\n\n";
+
+            cout << left << setw(15) << "Roll No"
+                 << setw(25) << "Name"
+                 << setw(10) << "Age"
+                 << setw(20) << "Department" << endl;
+
+            cout << "--------------------------------------------------------------\n";
+
+            s.display();
+
+            found = true;
+            break;
+        }
+    }
+
+    file.close();
+
+    if (!found)
+    {
+        cout << "\nStudent Record Not Found!\n";
+    }
+}
+
+void deleteStudent()
+{
+    int roll;
+    bool found = false;
+
+    cout << "\nEnter Roll Number to Delete : ";
+    cin >> roll;
+
+    ifstream file("students.txt");
+    ofstream temp("temp.txt");
+
+    Student s;
+
+    while (s.readFromFile(file))
+    {
+        if (s.getRollNo() == roll)
+        {
+            found = true;
+        }
+        else
+        {
+            s.writeTemp(temp);
+        }
+    }
+
+    file.close();
+    temp.close();
+
+    remove("students.txt");
+    rename("temp.txt", "students.txt");
+
+    if (found)
+    {
+        cout << "\nStudent Record Deleted Successfully!\n";
+    }
+    else
+    {
+        cout << "\nStudent Record Not Found!\n";
+    }
+}
+
+void updateStudent()
+{
+    int roll;
+    bool found = false;
+
+    cout << "\nEnter Roll Number to Update : ";
+    cin >> roll;
+
+    ifstream file("students.txt");
+    ofstream temp("temp.txt");
+
+    Student s;
+
+    while (s.readFromFile(file))
+    {
+        if (s.getRollNo() == roll)
+        {
+            found = true;
+
+            cout << "\nEnter New Details\n";
+
+            s.input();
+        }
+
+        s.writeTemp(temp);
+    }
+
+    file.close();
+    temp.close();
+
+    remove("students.txt");
+    rename("temp.txt", "students.txt");
+
+    if (found)
+    {
+        cout << "\nStudent Record Updated Successfully!\n";
+    }
+    else
+    {
+        cout << "\nStudent Record Not Found!\n";
+    }
+}
+
+int main()
+{
+    int choice;
+
+    do
+    {
+        cout << "\n\n========== STUDENT MANAGEMENT SYSTEM ==========\n";
+
+        cout << "\n1. Add Student";
+        cout << "\n2. Display Students";
+        cout << "\n3. Search Student";
+        cout << "\n4. Update Student";
+        cout << "\n5. Delete Student";
+        cout << "\n6. Exit";
+
+        cout << "\n\nEnter Your Choice : ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            addStudent();
+            break;
+
+        case 2:
+            displayStudents();
+            break;
+
+        case 3:
+            searchStudent();
+            break;
+
+        case 4:
+            updateStudent();
+            break;
+
+        case 5:
+            deleteStudent();
+            break;
+
+        case 6:
+            cout << "\nProgram Exited Successfully!\n";
+            break;
+
+        default:
+            cout << "\nInvalid Choice! Please Try Again.\n";
+        }
+
+    } while (choice != 6);
+
+    return 0;
+}
