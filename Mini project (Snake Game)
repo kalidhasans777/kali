@@ -1,0 +1,64 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+
+int main() {
+    const int N = 10;
+    char board[N][N];
+
+    int snakeX = 5, snakeY = 5;
+    int foodX, foodY;
+    int score = 0;
+    char move;
+
+    srand(time(0));
+
+    foodX = rand() % N;
+    foodY = rand() % N;
+
+    while (true) {
+        // Draw board
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (i == snakeX && j == snakeY)
+                    cout << "S ";
+                else if (i == foodX && j == foodY)
+                    cout << "F ";
+                else
+                    cout << ". ";
+            }
+            cout << endl;
+        }
+
+        cout << "\nScore: " << score;
+        cout << "\nMove (W/A/S/D, Q to quit): ";
+        cin >> move;
+
+        if (move == 'q' || move == 'Q')
+            break;
+
+        if (move == 'w' || move == 'W') snakeX--;
+        else if (move == 's' || move == 'S') snakeX++;
+        else if (move == 'a' || move == 'A') snakeY--;
+        else if (move == 'd' || move == 'D') snakeY++;
+
+        // Game Over
+        if (snakeX < 0 || snakeX >= N || snakeY < 0 || snakeY >= N) {
+            cout << "\nGame Over!\n";
+            break;
+        }
+
+        // Eat Food
+        if (snakeX == foodX && snakeY == foodY) {
+            score++;
+            foodX = rand() % N;
+            foodY = rand() % N;
+        }
+
+        cout << string(20, '\n'); // Clear screen effect
+    }
+
+    cout << "Final Score: " << score << endl;
+    return 0;
+}
