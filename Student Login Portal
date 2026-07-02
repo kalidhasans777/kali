@@ -1,0 +1,90 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+
+class Student {
+public:
+    string username, password, name;
+};
+
+void registerStudent() {
+    Student s;
+    ofstream file("students.txt", ios::app);
+
+    cout << "\nEnter Name: ";
+    cin.ignore();
+    getline(cin, s.name);
+
+    cout << "Enter Username: ";
+    cin >> s.username;
+
+    cout << "Enter Password: ";
+    cin >> s.password;
+
+    file << s.name << " "
+         << s.username << " "
+         << s.password << endl;
+
+    file.close();
+
+    cout << "\nRegistration Successful!\n";
+}
+
+void loginStudent() {
+    string user, pass;
+    Student s;
+    bool found = false;
+
+    cout << "\nEnter Username: ";
+    cin >> user;
+
+    cout << "Enter Password: ";
+    cin >> pass;
+
+    ifstream file("students.txt");
+
+    while (file >> s.name >> s.username >> s.password) {
+        if (user == s.username && pass == s.password) {
+            found = true;
+            cout << "\nLogin Successful!\n";
+            cout << "Welcome " << s.name << endl;
+            break;
+        }
+    }
+
+    file.close();
+
+    if (!found)
+        cout << "\nInvalid Username or Password!\n";
+}
+
+int main() {
+    int choice;
+
+    do {
+        cout << "\n===== STUDENT LOGIN PORTAL =====\n";
+        cout << "1. Register\n";
+        cout << "2. Login\n";
+        cout << "3. Exit\n";
+        cout << "Enter Choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                registerStudent();
+                break;
+            case 2:
+                loginStudent();
+                break;
+            case 3:
+                cout << "Thank You!\n";
+                break;
+            default:
+                cout << "Invalid Choice!\n";
+        }
+
+    } while (choice != 3);
+
+    return 0;
+}
